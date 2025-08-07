@@ -1,53 +1,62 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Royal Gift — Queen Access</title>
 
   <!-- Шрифт -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"/>
 
-  <!-- Конфетти -->
+  <!-- Конфетти CDN -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
 
   <style>
     :root{--brand:#c59fc9;--bg1:#ffd6e7;--bg2:#fff8f0;--text:#1e1b4b;}
-    *{box-sizing:border-box}
+    *{box-sizing:border-box;margin:0}
     body{
-      margin:0;font-family:Poppins,sans-serif;color:var(--text);
-      min-height:100vh;display:flex;align-items:center;justify-content:center;
+      font-family:'Poppins',sans-serif;color:var(--text);
+      min-height:100vh;display:flex;justify-content:center;align-items:center;
       background:linear-gradient(135deg,var(--bg1),var(--bg2));
       background-size:400% 400%;animation:bg 20s ease-in-out infinite;
     }
     @keyframes bg{0%{background-position:0 0}50%{background-position:100% 100%}100%{background-position:0 0}}
-    .hidden{display:none}
-    /* интро */
-    #intro{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#0007;z-index:10}
+
+    /* интро-оверлей */
+    #intro{
+      position:fixed;inset:0;
+      display:flex;justify-content:center;align-items:center;
+      background:#0007;z-index:10;
+    }
     /* форма */
-    input{padding:.7rem 1rem;border:2px solid var(--brand);border-radius:10px;text-align:center;font-size:1rem;width:220px}
-    button{margin-top:1rem;padding:.7rem 1.4rem;border:none;border-radius:12px;background:var(--brand);color:#fff;font-weight:600;font-size:1rem}
-    /* shake */
+    input{padding:.6rem 1rem;border:2px solid var(--brand);border-radius:10px;text-align:center;font-size:1rem;width:220px}
+    button{margin-top:.9rem;padding:.65rem 1.4rem;border:none;border-radius:12px;background:var(--brand);color:#fff;font-weight:600;font-size:1rem;cursor:pointer}
+    h1{font-size:1.6rem;margin-bottom:.6rem;color:var(--brand)}
+    /* shake-эффект */
     @keyframes shake{10%,90%{transform:translateX(-3px);}20%,80%{transform:translateX(3px);}30%,50%,70%{transform:translateX(-5px);}40%,60%{transform:translateX(5px);}}
-    .shake{animation:shake .5s;}
+    .shake{animation:shake .48s}
   </style>
 </head>
 <body>
 
-<!-- интро-корона (PNG, можно заменить на своё PNG или Lottie позже) -->
+<!-- Интро с короной (PNG можно заменить на Lottie позже) -->
 <div id="intro">
   <img id="crown" src="https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f451.png"
-       alt="crown" width="140" height="140"/>
+       width="130" height="130" alt="crown">
 </div>
 
-<!-- основное приложение -->
-<main id="app" class="hidden" style="text-align:center">
-  <h1 style="font-size:1.6rem;margin-bottom:.6rem;color:var(--brand)">Служба поддержки роскоши на связи!</h1>
-  <p style="margin:0 0 1.2rem">Введите код <strong>I'M A QUEEN</strong></p>
-  <input id="code" placeholder="код"/>
-  <br/>
+<!-- Основное приложение -->
+<main id="app" style="text-align:center;display:none">
+  <h1>Служба поддержки роскоши на связи!</h1>
+  <p style="margin:0 0 1.2rem">Введите код <strong>I'M&nbsp;A&nbsp;QUEEN</strong></p>
+
+  <input id="code" placeholder="код">
+  <br>
   <button id="go">Войти</button>
-  <p id="err" style="color:#e03131;font-weight:600;display:none;margin-top:.8rem">Код неверный — уходи, холоп!</p>
+
+  <p id="err" style="color:#e03131;font-weight:600;margin-top:.8rem;display:none">
+    Код неверный — уходи, холоп!
+  </p>
 </main>
 
 <script>
@@ -58,33 +67,35 @@ const $ = id => document.getElementById(id),
       code  = $('code'),
       goBtn = $('go');
 
-/* --- Показ основного UI --- */
+/* ---------- гарантированный выход из интро ---------- */
 function showMain(){
-  if(intro.classList.contains('hidden')) return; // уже скрыли
-  intro.classList.add('hidden');
-  app.classList.remove('hidden');
+  if(intro.style.display==='none') return;      // уже скрыли
+  intro.style.display = 'none';                 // скрываем overlay НАВЕРНЯКА
+  app.style.display   = 'block';                // показываем форму
 }
+
 /* 1) авто-таймер 3 с */
 setTimeout(showMain, 3000);
-/* 2) когда картинка короны загрузилась */
+/* 2) корона-PNG загрузилась */
 $('crown').addEventListener('load', showMain);
-/* 3) тап по интро */
+/* 3) пользователь тапнул по экрану */
 intro.addEventListener('click', showMain);
 
-/* --- Проверка кода --- */
-goBtn.onclick = check;
-code.onkeyup  = e => e.key === 'Enter' && check();
+/* ---------- проверка кода ---------- */
+goBtn.onclick = checkCode;
+code.addEventListener('keyup', e => e.key === 'Enter' && checkCode());
 
-function check(){
-  err.style.display='none';
+function checkCode(){
+  err.style.display = 'none';
   code.classList.remove('shake');
-  if(code.value.trim().toUpperCase() === "I'M A QUEEN"){
-    confetti({particleCount:160,spread:120});
-    alert('Доступ открыт!');                       // ← здесь можно вывести ваш Success-экран
+
+  if(code.value.trim().toUpperCase() === \"I'M A QUEEN\"){
+    confetti({particleCount:180,spread:150});
+    alert('Доступ открыт!');           // здесь можно вывести экран поздравления
   }else{
-    err.style.display='block';
+    err.style.display = 'block';
     code.classList.add('shake');
-    navigator.vibrate?.([150,50,150]);
+    navigator.vibrate?.([150,60,150]);
   }
 }
 </script>
