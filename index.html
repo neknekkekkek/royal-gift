@@ -8,12 +8,12 @@
   <!-- Шрифт -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"/>
 
-  <!-- Конфетти CDN -->
+  <!-- Конфетти -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
 
   <style>
     :root{--brand:#c59fc9;--bg1:#ffd6e7;--bg2:#fff8f0;--text:#1e1b4b;}
-    *{box-sizing:border-box;margin:0}
+    *{box-sizing:border-box;margin:0;padding:0}
     body{
       font-family:'Poppins',sans-serif;color:var(--text);
       min-height:100vh;display:flex;justify-content:center;align-items:center;
@@ -23,79 +23,94 @@
     @keyframes bg{0%{background-position:0 0}50%{background-position:100% 100%}100%{background-position:0 0}}
 
     /* интро-оверлей */
-    #intro{
+    #introAnim{
       position:fixed;inset:0;
       display:flex;justify-content:center;align-items:center;
       background:#0007;z-index:10;
     }
+    .hidden{display:none}
+
     /* форма */
-    input{padding:.6rem 1rem;border:2px solid var(--brand);border-radius:10px;text-align:center;font-size:1rem;width:220px}
-    button{margin-top:.9rem;padding:.65rem 1.4rem;border:none;border-radius:12px;background:var(--brand);color:#fff;font-weight:600;font-size:1rem;cursor:pointer}
-    h1{font-size:1.6rem;margin-bottom:.6rem;color:var(--brand)}
-    /* shake-эффект */
-    @keyframes shake{10%,90%{transform:translateX(-3px);}20%,80%{transform:translateX(3px);}30%,50%,70%{transform:translateX(-5px);}40%,60%{transform:translateX(5px);}}
+    h1{font-size:1.7rem;margin-bottom:.7rem;color:var(--brand)}
+    p{margin:.6rem 0}
+    input{
+      width:220px;padding:.7rem 1rem;
+      border:2px solid var(--brand);border-radius:10px;
+      text-align:center;font-size:1rem
+    }
+    button{
+      margin-top:1rem;padding:.7rem 1.5rem;
+      border:none;border-radius:12px;background:var(--brand);
+      color:#fff;font-size:1rem;font-weight:600;cursor:pointer
+    }
+
+    /* shake для ошибки */
+    @keyframes shake{
+      10%,90%{transform:translateX(-3px);}
+      20%,80%{transform:translateX(3px);}
+      30%,50%,70%{transform:translateX(-5px);}
+      40%,60%{transform:translateX(5px);}
+    }
     .shake{animation:shake .48s}
   </style>
 </head>
 <body>
 
-<!-- Интро с короной (PNG можно заменить на Lottie позже) -->
-<div id="intro">
+<!-- Интро-корона -->
+<div id="introAnim">
   <img id="crown" src="https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f451.png"
-       width="130" height="130" alt="crown">
+       alt="crown" width="140" height="140">
 </div>
 
-<!-- Основное приложение -->
-<main id="app" style="text-align:center;display:none">
+<!-- Главный интерфейс -->
+<main id="main" class="hidden" style="text-align:center">
   <h1>Служба поддержки роскоши на связи!</h1>
-  <p style="margin:0 0 1.2rem">Введите код <strong>I'M&nbsp;A&nbsp;QUEEN</strong></p>
+  <p>Введите код <strong>I'M&nbsp;A&nbsp;QUEEN</strong></p>
 
   <input id="code" placeholder="код">
   <br>
   <button id="go">Войти</button>
 
-  <p id="err" style="color:#e03131;font-weight:600;margin-top:.8rem;display:none">
+  <p id="err" style="color:#e03131;font-weight:600;display:none;margin-top:.8rem">
     Код неверный — уходи, холоп!
   </p>
 </main>
 
 <script>
 const $ = id => document.getElementById(id),
-      intro = $('intro'),
-      app   = $('app'),
-      err   = $('err'),
+      intro = $('introAnim'),
+      main  = $('main'),
       code  = $('code'),
-      goBtn = $('go');
+      err   = $('err');
 
 /* ---------- гарантированный выход из интро ---------- */
 function showMain(){
-  if(intro.style.display==='none') return;      // уже скрыли
-  intro.style.display = 'none';                 // скрываем overlay НАВЕРНЯКА
-  app.style.display   = 'block';                // показываем форму
+  intro.classList.add('hidden');     // прячем overlay
+  main.classList.remove('hidden');   // показываем форму
 }
 
-/* 1) авто-таймер 3 с */
+/* 1. таймер-страховка */
 setTimeout(showMain, 3000);
-/* 2) корона-PNG загрузилась */
+/* 2. картинка короны загрузилась */
 $('crown').addEventListener('load', showMain);
-/* 3) пользователь тапнул по экрану */
+/* 3. пользователь тапнул по экрану */
 intro.addEventListener('click', showMain);
 
 /* ---------- проверка кода ---------- */
-goBtn.onclick = checkCode;
-code.addEventListener('keyup', e => e.key === 'Enter' && checkCode());
+$('go').onclick = checkCode;
+code.addEventListener('keyup', e => e.key==='Enter' && checkCode());
 
 function checkCode(){
-  err.style.display = 'none';
+  err.style.display='none';
   code.classList.remove('shake');
 
-  if(code.value.trim().toUpperCase() === \"I'M A QUEEN\"){
+  if(code.value.trim().toUpperCase()==="I'M A QUEEN"){
     confetti({particleCount:180,spread:150});
-    alert('Доступ открыт!');           // здесь можно вывести экран поздравления
+    alert('Доступ открыт! 🎉');   // тут вставь свой Success-экран
   }else{
-    err.style.display = 'block';
+    err.style.display='block';
     code.classList.add('shake');
-    navigator.vibrate?.([150,60,150]);
+    navigator.vibrate?.([120,60,120]);
   }
 }
 </script>
