@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Royal Gift – Queen Access</title>
+  <!-- Google font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#c59fc9" />
   <script src="https://cdn.tailwindcss.com"></script>
@@ -15,37 +17,49 @@
   <style>
     :root{
       --brand:#c59fc9;--bg1:#ffd6e7;--bg2:#fff8f0;--text:#1e1b4b;--glass-bg:rgba(255,255,255,.25);--glass-brd:rgba(255,255,255,.4);
-      --hc-bg:#000;--hc-text:#fff;--grad-pos:0%;
+      --hc-bg:#000;--hc-text:#fff;
     }
-    body{margin:0;font-family:'Segoe UI',sans-serif;color:var(--text);min-height:100vh;overflow:hidden;background:linear-gradient(135deg,var(--bg1),var(--bg2));background-size:400% 400%;animation:bgshift 20s ease-in-out infinite;}
+    body{margin:0;font-family:'Poppins',sans-serif;color:var(--text);min-height:100vh;overflow:hidden;background:linear-gradient(135deg,var(--bg1),var(--bg2));background-size:400% 400%;animation:bgshift 20s ease-in-out infinite;}
     @keyframes bgshift{0%{background-position:0 0}50%{background-position:100% 100%}100%{background-position:0 0}}
-    .glass{background:var(--glass-bg);border:1px solid var(--glass-brd);backdrop-filter:blur(12px);}
-    .light{mask-image:radial-gradient(180px at var(--mx) var(--my),#000 0%,transparent 70%);}
-    .btn-border{border:3px solid transparent;border-image:linear-gradient(130deg,#ff8bd7,#b18bff,#ffcf6e) 1;animation:borderSpin 5s linear infinite;}
-    @keyframes borderSpin{to{border-image-slice:1;transform:rotate(360deg)}}
+    /* glass + inner glow */
+    .glass{background:var(--glass-bg);border:1px solid var(--glass-brd);backdrop-filter:blur(12px);box-shadow:inset 0 0 20px rgba(255,255,255,.35),inset 0 0 8px rgba(255,255,255,.15);}
+    /* neon accent */
+    .neon{outline:2px solid var(--brand);box-shadow:0 0 8px var(--brand),0 0 12px var(--brand) inset;transition:box-shadow .3s;}
+    .neon:focus-visible{box-shadow:0 0 12px var(--brand),0 0 20px var(--brand) inset;}
+    /* button shimmer */
+    .btn-shine{position:relative;overflow:hidden;border:3px solid var(--brand);}
+    .btn-shine::after{content:"";position:absolute;top:0;left:-150%;width:50%;height:100%;background:rgba(255,255,255,.4);transform:skewX(-20deg);animation:shine 8s linear infinite;}
+    @keyframes shine{0%{left:-150%}50%{left:130%}100%{left:130%}}
+    /* particles */
     #particles{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;}
+    /* tilt */
     .tilt{transition:transform .1s ease-out;will-change:transform;}
-    #glow{position:fixed;bottom:0;left:0;width:100%;height:4px;background:linear-gradient(90deg,#ff00ff,#00ffff);opacity:.4;transform:scaleX(0);transform-origin:left;transition:transform .1s;}
+    /* svg pulse */
+    @keyframes pulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 0 var(--brand));}50%{transform:scale(1.1);filter:drop-shadow(0 0 10px var(--brand));}}
+    #morph{animation:pulse 15s ease-in-out infinite;}
+    /* shake */
+    @keyframes shake{10%,90%{transform:translateX(-2px);}20%,80%{transform:translateX(4px);}30%,50%,70%{transform:translateX(-6px);}40%,60%{transform:translateX(6px);} }
+    .shake{animation:shake .5s ease-in-out;}
+    /* high contrast */
     .hc{background:var(--hc-bg)!important;color:var(--hc-text)!important;}
     .hc .glass{background:#111!important;border-color:#444!important;color:#fff!important;}
   </style>
 </head>
-<body class="selection:bg-pink-200">
+<body>
   <div id="particles"></div>
-  <div id="glow"></div>
 
   <button id="hcToggle" class="fixed top-3 left-3 z-50 bg-[var(--brand)] text-white rounded-full w-10 h-10">👁‍🗨</button>
 
   <div id="introAnim" class="fixed inset-0 flex items-center justify-center bg-[#0008] z-50">
-    <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_qp1q7mct.json" background="transparent" speed="1" style="width:280px;height:280px" autoplay></lottie-player>
+    <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_qp1q7mct.json" background="transparent" speed="1" style="width:260px;height:260px" autoplay></lottie-player>
   </div>
 
   <section id="main" class="hidden flex flex-col items-center justify-center min-h-screen text-center p-6 space-y-4">
     <h1 class="text-3xl font-bold text-[var(--brand)]">Служба поддержки роскоши на связи!</h1>
     <p>Мы получили Ваш запрос на активацию удовольствия уровня <strong>GOLD</strong>.<br>Для подтверждения статуса просим:</p>
     <p>👉 отсканируйте QR-код<br/>👉 введите магическое заклинание:</p>
-    <input id="code" class="input input-bordered w-64 text-center" placeholder="Введите код…" />
-    <button id="enter" class="btn-border px-6 py-2 rounded-xl font-semibold relative overflow-hidden">Войти</button>
+    <input id="code" class="input input-bordered w-64 text-center neon" placeholder="Введите код…" />
+    <button id="enter" class="btn-shine rounded-xl px-6 py-2 font-semibold text-white bg-[var(--brand)]">Войти</button>
     <p id="error" class="text-red-600 font-semibold hidden"></p>
     <p id="count" class="text-5xl font-extrabold mt-4 hidden"></p>
   </section>
@@ -57,24 +71,24 @@
       <div class="glass tilt light p-4">🍰 Авторский десерт от шефа</div>
       <div class="glass tilt light p-4">💐 Букет, достойный королевского дворца</div>
     </div>
-    <button id="share" class="btn btn-secondary">Поделиться счастьем</button>
+    <button id="share" class="btn bg-[var(--brand)] text-white px-4 py-2 rounded-xl neon">Поделиться счастьем</button>
     <p>С любовью,<br><em>Международная система радости™</em></p>
   </section>
 
   <audio id="fanfare" src="https://cdn.pixabay.com/download/audio/2022/02/23/audio_381c2e7d8d.mp3?filename=success-fanfare-trumpets-6185.mp3" preload="auto"></audio>
   <audio id="bgmusic" src="https://cdn.pixabay.com/download/audio/2022/07/26/audio_00a7a0d8f3.mp3?filename=magical-chime-113985.mp3" loop preload="auto"></audio>
 <script>
+// high contrast toggle
 hcToggle.onclick=()=>document.body.classList.toggle('hc');
+// Intro finish
 setTimeout(()=>{introAnim.classList.add('hidden');main.classList.remove('hidden');initParticles();},2500);
-function initParticles(){tsParticles.load("particles",{fullScreen:{enable:false},particles:{number:{value:30},shape:{type:"circle"},size:{value:{min:2,max:4}},move:{enable:true,speed:0.4,parallax:{enable:true,smooth:20}},opacity:{value:{min:0.3,max:0.8}},color:{value:["#ff9dff","#9dfffc","#fff0c4"]},links:{enable:false}},detectRetina:true});}
+function initParticles(){tsParticles.load("particles",{fullScreen:{enable:false},particles:{number:{value:30},size:{value:{min:2,max:4}},move:{enable:true,speed:0.5,parallax:{enable:true,smooth:20}},opacity:{value:{min:0.3,max:0.8}},color:{value:["#ff9dff","#9dfffc","#fff0c4"]}},detectRetina:true});}
+// typewriter
 let txt="I'M A QUEEN",idx=0;setInterval(()=>{if(document.activeElement!==code){code.placeholder=txt.slice(0,idx);idx=(idx+1)% (txt.length+1)}},140);
+// handle code
 enter.addEventListener('click',run);code.addEventListener('keyup',e=>e.key==='Enter'&&run());
-function run(){error.classList.add('hidden');if(code.value.trim().toUpperCase()==="I'M A QUEEN"){startCount();}else{error.textContent='Код введён неверно — уходи, холоп!';error.classList.remove('hidden');navigator.vibrate([200,100,200]);}}
-function startCount(){main.classList.add('hidden');count.classList.remove('hidden');let n=3;count.textContent=n;const t=setInterval(()=>{n--;if(n>0){count.textContent=n;}else{clearInterval(t);morphSuccess();}},800);}
-function morphSuccess(){count.classList.add('hidden');success.classList.remove('hidden');morphIcon();confetti({particleCount:240,spread:180,origin:{y:0.7},emojis:['💎','👑','✨']});fanfare.play();bgmusic.volume=0.25;bgmusic.play();navigator.vibrate([120,60,120]);}
-function morphIcon(){gsap.fromTo('#morph',{scale:0,rotate:0},{scale:1.2,rotate:360,duration:1,ease:'elastic.out(1,0.4)'});}  
-const tilts=document.querySelectorAll('.tilt');window.addEventListener('deviceorientation',e=>{tilts.forEach(el=>{el.style.transform=`perspective(600px) rotateX(${e.beta/25}deg) rotateY(${-e.gamma/25}deg)`;el.style.setProperty('--mx',`${50+e.gamma/2}%`);el.style.setProperty('--my',`${50+e.beta/2}%`);});document.getElementById('particles').style.filter=`blur(${Math.abs(e.beta)/30}px)`;});
-share.onclick=()=>navigator.share?navigator.share({title:'Queen Access',text:'Смотри какой подарок!',url:location.href}):alert('Скопируй ссылку =)');
-</script>
-</body>
-</html>
+function run(){error.classList.add('hidden');code.classList.remove('shake');if(code.value.trim().toUpperCase()==="I'M A QUEEN"){startCount()}else{error.textContent='Код введён неверно — уходи, холоп!';error.classList.remove('hidden');code.classList.add('shake');navigator.vibrate([200,100,200]);setTimeout(()=>code.classList.remove('shake'),500);}}
+function startCount(){main.classList.add('hidden');count.classList.remove('hidden');let n=3;count.textContent=n;const t=setInterval(()=>{n--;if(n>0){count.textContent=n;}else{clearInterval(t);showSuccess();}},800);}
+function showSuccess(){count.classList.add('hidden');success.classList.remove('hidden');confetti({particleCount:240,spread:180,origin:{y:0.7},emojis:['💎','👑','✨']});fanfare.play();bgmusic.volume=0.25;bgmusic.play();navigator.vibrate([120,60,120]);}
+// tilt effect
+const tilts=document.querySelectorAll('.tilt');window.addEventListener('deviceorientation',e=>{tilts.forEach(el=>{el.style.transform=`perspective(600px) rotateX(${e.beta/25}deg) rotateY(${-
