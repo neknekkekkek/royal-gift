@@ -212,10 +212,11 @@ const crown   = $('crownAnim');
 const mainSec = $('main');
 
 fetch('crown.json')
-  .then(r=>r.json())
-  .then(data=>crown.load(data))
+  .then(r => r.json())
+  .then(data => $('crownAnim').load(data))
   .catch(console.warn)
-  .finally(()=>delay(2500).then(showMain));
+  .then(() => delay(2500))        // ← всегда отрабатывает
+  .then(showMain);                // ← показываем UI
 
 function showMain(){
   intro.classList.add('hidden');
