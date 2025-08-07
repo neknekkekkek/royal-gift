@@ -1,1 +1,321 @@
-<!DOCTYPE html><html><head><meta charset='utf-8'><title>Placeholder</title></head><body>Hello</body></html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Royal Gift – Queen Access</title>
+
+  <!-- Google-шрифт -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- PWA-иконка (можно оставить, можно убрать вместе с этой строкой) -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#c59fc9" />
+
+  <!-- Внешние библиотеки -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root{
+      --brand:#c59fc9;
+      --bg1:#ffd6e7;
+      --bg2:#fff8f0;
+      --text:#1e1b4b;
+
+      --glass-bg:rgba(255,255,255,.25);
+      --glass-brd:rgba(255,255,255,.4);
+
+      --hc-bg:#000;
+      --hc-text:#fff;
+    }
+
+    /* ——— Базовые стили ——— */
+    body{
+      margin:0;
+      font-family:'Poppins',sans-serif;
+      color:var(--text);
+      min-height:100vh;
+      overflow:hidden;
+
+      background:linear-gradient(135deg,var(--bg1),var(--bg2));
+      background-size:400% 400%;
+      animation:bgshift 20s ease-in-out infinite;
+    }
+    @keyframes bgshift{
+      0%  {background-position:0 0}
+      50% {background-position:100% 100%}
+      100%{background-position:0 0}
+    }
+
+    /* Карточка-стекло с внутренним свечением */
+    .glass{
+      background:var(--glass-bg);
+      border:1px solid var(--glass-brd);
+      backdrop-filter:blur(12px);
+      box-shadow:
+        inset 0 0 18px rgba(255,255,255,.35),
+        inset 0 0 6px  rgba(255,255,255,.15);
+    }
+
+    /* Неоновая рамка для активных */
+    .neon{
+      outline:2px solid var(--brand);
+      box-shadow:0 0 8px var(--brand),0 0 12px var(--brand) inset;
+      transition:box-shadow .3s;
+    }
+    .neon:focus-visible{
+      box-shadow:0 0 12px var(--brand),0 0 20px var(--brand) inset;
+    }
+
+    /* Кнопка с редким бликом */
+    .btn-shine{
+      position:relative;
+      overflow:hidden;
+      border:3px solid var(--brand);
+    }
+    .btn-shine::after{
+      content:\"\";position:absolute;top:0;left:-150%;
+      width:50%;height:100%;
+      background:rgba(255,255,255,.35);
+      transform:skewX(-20deg);
+      animation:shine 8s linear infinite;
+    }
+    @keyframes shine{
+      0%  {left:-150%}
+      50% {left:130%}
+      100%{left:130%}
+    }
+
+    /* Частицы-фон */
+    #particles{
+      position:fixed;top:0;left:0;width:100%;height:100%;
+      z-index:-1;pointer-events:none;
+    }
+
+    /* Наклон карточек от гироскопа */
+    .tilt{transition:transform .1s ease-out;will-change:transform;}
+
+    /* Пульсация текста QUEEN VERIFIED */
+    @keyframes pulse{
+      0%,100%{transform:scale(1);filter:drop-shadow(0 0 0 var(--brand));}
+      50%{transform:scale(1.1);filter:drop-shadow(0 0 10px var(--brand));}
+    }
+    #morph{animation:pulse 15s ease-in-out infinite;}
+
+    /* Shaking для ошибки */
+    @keyframes shake{
+      10%,90%{transform:translateX(-2px);}
+      20%,80%{transform:translateX(4px);}
+      30%,50%,70%{transform:translateX(-5px);}
+      40%,60%{transform:translateX(5px);}
+    }
+    .shake{animation:shake .5s ease-in-out;}
+
+    /* High-contrast режим */
+    .hc{background:var(--hc-bg)!important;color:var(--hc-text)!important;}
+    .hc .glass{background:#111!important;border-color:#444!important;color:#fff!important;}
+
+  </style>
+</head>
+<body>
+
+<!-- Кнопка контрастной темы -->
+<button id="hcToggle"
+        class="fixed top-3 left-3 z-50 bg-[var(--brand)] text-white rounded-full w-10 h-10">
+  👁‍🗨
+</button>
+
+<!-- Частицы -->
+<div id="particles"></div>
+
+<!-- Интро c локальным JSON -->
+<div id="introAnim"
+     class="fixed inset-0 flex items-center justify-center bg-[#0008] z-50">
+  <!-- Корона грузится из crown.json -->
+  <lottie-player id="crownAnim"
+                 style="width:240px;height:240px"></lottie-player>
+</div>
+
+<!-- Главный экран -->
+<section id="main"
+         class="hidden flex flex-col items-center justify-center min-h-screen text-center p-6 space-y-4">
+
+  <h1 class="text-3xl font-bold text-[var(--brand)]">
+    Служба поддержки роскоши на связи!
+  </h1>
+
+  <p>Мы получили Ваш запрос на активацию удовольствия уровня
+     <strong>GOLD</strong>.<br>
+     Для подтверждения статуса просим:</p>
+  <p>👉 отсканируйте QR-код<br>👉 введите магическое заклинание:</p>
+
+  <input id="code"
+         class="input input-bordered w-64 text-center neon"
+         placeholder="Введите код…"/>
+
+  <button id="enter"
+          class="btn-shine rounded-xl px-6 py-2 font-semibold text-white bg-[var(--brand)]">
+    Войти
+  </button>
+
+  <p id="error" class="text-red-600 font-semibold hidden"></p>
+  <p id="count" class="text-5xl font-extrabold mt-4 hidden"></p>
+</section>
+
+<!-- Экран успеха -->
+<section id="success"
+         class="hidden flex flex-col items-center justify-center min-h-screen text-center p-6 space-y-6">
+
+  <svg id="morph" width="120" height="120" viewBox="0 0 24 24"
+       fill="none" stroke="#c59fc9" stroke-width="2"
+       stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 2l3 7h7l-5 5 2 7-6-4-6 4 2-7-5-5h7z"/>
+  </svg>
+
+  <div class="grid gap-4 w-full max-w-xs">
+    <div class="glass tilt p-4">👑 Одна настоящая купюра среди подданных</div>
+    <div class="glass tilt p-4">🍰 Авторский десерт от шефа</div>
+    <div class="glass tilt p-4">💐 Букет, достойный королевского дворца</div>
+  </div>
+
+  <button id="share"
+          class="btn bg-[var(--brand)] text-white px-4 py-2 rounded-xl neon">
+    Поделиться счастьем
+  </button>
+
+  <p>С любовью,<br><em>Международная система радости™</em></p>
+</section>
+
+<!-- Аудио -->
+<audio id="fanfare"
+       src="https://cdn.pixabay.com/download/audio/2022/02/23/audio_381c2e7d8d.mp3?filename=success-fanfare-trumpets-6185.mp3"
+       preload="auto"></audio>
+<audio id="bgmusic"
+       src="https://cdn.pixabay.com/download/audio/2022/07/26/audio_00a7a0d8f3.mp3?filename=magical-chime-113985.mp3"
+       loop preload="auto"></audio>
+
+<script>
+/* ---------- Хелперы ---------- */
+const $ = id => document.getElementById(id),
+      delay = ms => new Promise(r=>setTimeout(r,ms));
+
+/* ---------- Контрастный режим ---------- */
+$('hcToggle').onclick = ()=> document.body.classList.toggle('hc');
+
+/* ---------- Интро + загрузка короны ---------- */
+const intro   = $('introAnim');
+const crown   = $('crownAnim');
+const mainSec = $('main');
+
+fetch('crown.json')
+  .then(r=>r.json())
+  .then(data=>crown.load(data))
+  .catch(console.warn)
+  .finally(()=>delay(2500).then(showMain));
+
+function showMain(){
+  intro.classList.add('hidden');
+  mainSec.classList.remove('hidden');
+  initParticles();
+}
+
+/* ---------- Частицы ---------- */
+function initParticles(){
+  tsParticles.load('particles',{
+    fullScreen:{enable:false},
+    particles:{
+      number:{value:30},
+      size:{value:{min:2,max:4}},
+      move:{enable:true,speed:0.5,parallax:{enable:true,smooth:20}},
+      opacity:{value:{min:0.3,max:0.8}},
+      color:{value:['#ff9dff','#9dfffc','#fff0c4']}
+    },
+    detectRetina:true
+  });
+}
+
+/* ---------- Ввод кода ---------- */
+const codeInp = $('code'),
+      enterBt = $('enter'),
+      errorEl = $('error'),
+      countEl = $('count'),
+      success = $('success');
+
+enterBt.onclick    = checkCode;
+codeInp.onkeyup    = e=> e.key==='Enter' && checkCode();
+
+let typeTxt = \"I'M A QUEEN\", idx=0;
+setInterval(()=>{
+  if(document.activeElement!==codeInp){
+    codeInp.placeholder = typeTxt.slice(0,idx);
+    idx = (idx+1)% (typeTxt.length+1);
+  }
+},140);
+
+function checkCode(){
+  errorEl.classList.add('hidden');
+  codeInp.classList.remove('shake');
+
+  if(codeInp.value.trim().toUpperCase() === typeTxt){
+    runCountdown();
+  }else{
+    errorEl.textContent = 'Код введён неверно — уходи, холоп!';
+    errorEl.classList.remove('hidden');
+    codeInp.classList.add('shake');
+    navigator.vibrate?.([200,100,200]);
+    setTimeout(()=>codeInp.classList.remove('shake'),500);
+  }
+}
+
+async function runCountdown(){
+  mainSec.classList.add('hidden');
+  countEl.classList.remove('hidden');
+  for(let n=3;n>0;n--){
+    countEl.textContent = n;
+    navigator.vibrate?.(50);
+    await delay(800);
+  }
+  showSuccess();
+}
+
+/* ---------- Успех ---------- */
+function showSuccess(){
+  countEl.classList.add('hidden');
+  success.classList.remove('hidden');
+
+  // конфетти
+  confetti({
+    particleCount:240,
+    spread:180,
+    origin:{y:0.7},
+    emojis:['💎','👑','✨']
+  });
+
+  $('fanfare').play();
+  const bg = $('bgmusic'); bg.volume=.25; bg.play();
+  navigator.vibrate?.([120,60,120]);
+}
+
+/* ---------- Tilt карточек ---------- */
+const tilts = document.querySelectorAll('.tilt');
+window.addEventListener('deviceorientation',e=>{
+  tilts.forEach(el=>{
+    el.style.transform =
+      `perspective(600px) rotateX(${e.beta/30}deg) rotateY(${-e.gamma/30}deg)`;
+  });
+});
+
+/* ---------- Share ---------- */
+$('share').onclick =()=>{
+  navigator.share
+    ? navigator.share({title:'Queen Access',text:'Оцени подарок!',url:location.href})
+    : alert('Скопируйте ссылку вручную :)');
+};
+
+</script>
+</body>
+</html>
