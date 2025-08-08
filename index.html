@@ -69,13 +69,28 @@
 
     /* flip-карточка */
     .flip{perspective:800px;cursor:pointer}
-    .flip-inner{
+   /* ===== анимация «вибрирующий телефон» ===== */
+@keyframes vibrate {
+  0%  { transform: translate(0)             rotate(0deg);  }
+  20% { transform: translate(-4px,  3px)    rotate(-3deg); }
+  40% { transform: translate( 3px, -3px)    rotate( 3deg); }
+  60% { transform: translate(-3px,  2px)    rotate(-2deg); }
+  80% { transform: translate( 2px, -4px)    rotate( 2deg); }
+  100%{ transform: translate(0)             rotate(0deg);  }
+}
+
+.flip-inner{
   position:relative;
   transition:transform .6s;
   transform-style:preserve-3d;
   height:100%;
-  /* 👉 лёгкое покачивание   */
-  animation:wiggle 3s ease-in-out infinite;
+  animation:vibrate 0.8s linear infinite;   /* ← заметная дрожь */
+}
+
+/* отключаем дрожь, когда карточка перевернулась */
+.flip.flipped .flip-inner{
+  transform:rotateY(180deg);
+  animation:none;
 }
 
 .flip.flipped .flip-inner{
