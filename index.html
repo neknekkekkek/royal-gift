@@ -1,215 +1,159 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Royal Gift – Queen Access</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Royal Gift – Queen Access</title>
 
-  <!-- PWA (опционально) -->
-  <link rel="manifest" href="manifest.webmanifest" />
-  <meta name="theme-color" content="#c59fc9" />
+<!-- PWA (опц.) -->
+<link rel="manifest" href="manifest.webmanifest"/>
+<meta name="theme-color" content="#c59fc9"/>
 
-  <!-- Tailwind + внешние либы -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<!-- Tailwind + CDN-скрипты -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-  <style>
-    /* --------- базовая палитра --------- */
-    :root{
-      --brand:#c59fc9;
-      --bg1:#ffd6e7;
-      --bg2:#fff8f0;
-      --text:#1e1b4b;
-      --glass:#ffffff40;
-      --glass-brd:#ffffff66;
-    }
-    /* фон */
-    body{
-      margin:0;
-      font-family:'Segoe UI',sans-serif;
-      color:var(--text);
-      min-height:100vh;
-      overflow:hidden;
-      background:linear-gradient(135deg,var(--bg1),var(--bg2));
-      background-size:400% 400%;
-      animation:bgshift 20s ease-in-out infinite;
-    }
-    @keyframes bgshift{
-      0%{background-position:0 0}
-      50%{background-position:100% 100%}
-      100%{background-position:0 0}
-    }
-    /* карточки-стекло */
-    .glass{
-      background:var(--glass);
-      border:1px solid var(--glass-brd);
-      backdrop-filter:blur(12px);
-      box-shadow:inset 0 0 18px rgba(255,255,255,.35),
-                 inset 0 0 6px rgba(255,255,255,.15);
-    }
-    /* кнопка с солнечным бликом */
-    .btn-glow{
-      position:relative;
-      border:3px solid var(--brand);
-      overflow:hidden;
-    }
-    .btn-glow::after{
-      content:'';
-      position:absolute;top:0;left:-120%;
-      width:60%;height:100%;
-      background:linear-gradient(120deg,transparent 10%,rgba(255,255,255,.55) 35%,transparent 60%);
-      transform:skewX(-25deg);
-      animation:shine 4s ease-in-out infinite;
-    }
-    @keyframes shine{
-      0%  {left:-120%}
-      55% {left:130%}   /* проходит и замирает */
-      100%{left:130%}
-    }
-    /* скрытие */
-    .hidden{display:none}
-    /* shake */
-    @keyframes shake{10%,90%{transform:translateX(-3px);}20%,80%{transform:translateX(3px);}30%,50%,70%{transform:translateX(-5px);}40%,60%{transform:translateX(5px);}}
-    .shake{animation:shake .48s}
-    /* фон-частицы */
-    #particles{position:fixed;inset:0;z-index:-1;pointer-events:none}
-  </style>
+<style>
+:root{
+  --brand:#c59fc9;--bg1:#ffd6e7;--bg2:#fff8f0;--text:#1e1b4b;
+  --glass:#ffffff40;--glass-brd:#ffffff66;
+}
+body{
+  margin:0;font-family:'Segoe UI',sans-serif;color:var(--text);
+  min-height:100vh;overflow:hidden;
+  background:linear-gradient(135deg,var(--bg1),var(--bg2));
+  background-size:400% 400%;animation:bgshift 20s ease-in-out infinite;
+}
+@keyframes bgshift{0%{background-position:0 0}50%{background-position:100% 100%}100%{background-position:0 0}}
+.glass{background:var(--glass);border:1px solid var(--glass-brd);backdrop-filter:blur(12px);box-shadow:inset 0 0 18px rgba(255,255,255,.35),inset 0 0 6px rgba(255,255,255,.15);}
+/* ---------- кнопка-блик ---------- */
+.btn-glow{position:relative;border:3px solid var(--brand);overflow:hidden}
+.btn-glow::after{content:'';position:absolute;top:0;left:-120%;width:60%;height:100%;background:linear-gradient(120deg,transparent 10%,rgba(255,255,255,.55) 35%,transparent 60%);transform:skewX(-25deg);animation:shine 4s ease-in-out infinite}
+@keyframes shine{0%{left:-120%}55%{left:130%}100%{left:130%}}
+.hidden{display:none}
+/* ---------- flip-карточка ---------- */
+.flip{perspective:800px;cursor:pointer}
+.flip-inner{position:relative;transition:transform .6s;transform-style:preserve-3d;height:100%}
+.flip.flipped .flip-inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:1rem;backface-visibility:hidden}
+.back{transform:rotateY(180deg)}
+@keyframes shake{10%,90%{transform:translateX(-3px);}20%,80%{transform:translateX(3px);}30%,50%,70%{transform:translateX(-5px);}40%,60%{transform:translateX(5px);}}
+.shake{animation:shake .48s}
+#particles{position:fixed;inset:0;z-index:-1;pointer-events:none}
+</style>
 </head>
 <body class="selection:bg-pink-300">
+<div id="particles"></div>
 
-  <!-- фон-частицы -->
-  <div id="particles"></div>
+<!-- интро -->
+<div id="introAnim" class="fixed inset-0 flex items-center justify-center bg-[#0008] z-50">
+  <lottie-player src="crown.json" background="transparent" speed="1" style="width:280px;height:280px" autoplay></lottie-player>
+</div>
 
-  <!-- интро -->
-  <div id="introAnim" class="fixed inset-0 flex items-center justify-center bg-[#0008] z-50">
-    <lottie-player src="crown.json"
-                   background="transparent" speed="1" style="width:280px;height:280px" autoplay></lottie-player>
-  </div>
+<!-- главный экран -->
+<section id="main" class="hidden flex flex-col items-center justify-center min-h-screen text-center p-6 space-y-4">
+  <h1 class="text-3xl font-bold text-[var(--brand)]">Служба поддержки роскоши на связи!</h1>
+  <p>Мы получили Ваш запрос на активацию удовольствия уровня <strong>GOLD</strong>.<br/>Для подтверждения статуса просим:</p>
+  <p>👉 Произнести 3 раза: «Я Королева»<br/>👉 Ввести магическое заклинание:</p>
 
-  <!-- главный экран -->
-  <section id="main" class="hidden flex flex-col items-center justify-center min-h-screen text-center p-6 space-y-4">
-    <h1 class="text-3xl font-bold text-[var(--brand)]">Служба поддержки роскоши на связи!</h1>
-    <p>Мы получили Ваш запрос на активацию удовольствия уровня <strong>GOLD</strong>.<br/>Для подтверждения статуса просим:</p>
-    <p>👉 Произнести 3 раза заклинание: Я Королева<br/>👉 введите магическое заклинание:</p>
+  <input id="code" class="input input-bordered w-64 text-center" placeholder="Введите код…"/>
 
-    <input id="code" class="input input-bordered w-64 text-center"
-           placeholder="Введите код…" />
+  <button id="enter" class="btn-glow px-6 py-2 rounded-xl font-semibold bg-[var(--brand)] text-white">
+    Войти
+  </button>
 
-    <!-- кнопка с новым эффектом -->
-    <button id="enter"
-            class="btn-glow px-6 py-2 rounded-xl font-semibold bg-[var(--brand)] text-white">
-      Войти
-    </button>
+  <p id="error" class="text-red-600 font-semibold hidden"></p>
+  <p id="count" class="text-5xl font-extrabold mt-4 hidden"></p>
+</section>
 
-    <p id="error" class="text-red-600 font-semibold hidden"></p>
-    <p id="count" class="text-5xl font-extrabold mt-4 hidden"></p>
-  </section>
+<!-- успех -->
+<section id="success" class="hidden flex flex-col items-center justify-center min-h-screen text-center p-6 space-y-6">
+  <svg id="morph" width="120" height="120" viewBox="0 0 24 24" fill="none"
+       stroke="#c59fc9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 2l3 7h7l-5 5 2 7-6-4-6 4 2-7-5-5h7z"/>
+  </svg>
 
-  <!-- успех -->
-  <section id="success" class="hidden flex flex-col items-center justify-center min-h-screen text-center p-6 space-y-6">
-    <svg id="morph" width="120" height="120" viewBox="0 0 24 24" fill="none"
-         stroke="#c59fc9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 2l3 7h7l-5 5 2 7-6-4-6 4 2-7-5-5h7z"/>
-    </svg>
-
-    <div class="grid gap-4 w-full max-w-xs">
-      <div class="glass p-4">👑 Одна настоящая купюра среди подданных</div>
-      <div class="glass p-4">🍰 Авторский десерт от шефа</div>
-      <div class="glass p-4">💐 Букет, достойный королевского дворца</div>
+  <!-- интерактивные карточки -->
+  <div class="grid gap-4 w-full max-w-xs">
+    <div class="flip glass h-24">
+      <div class="flip-inner">
+        <div class="face front">👑 Одна настоящая купюра среди подданных</div>
+        <div class="face back">💵 Настоящая купюра № 26</div>
+      </div>
     </div>
 
-    <button id="share" class="btn bg-[var(--brand)] text-white px-4 py-2 rounded-xl">Поделиться счастьем</button>
-    <p>С любовью,<br><em>Международная система радости™</em></p>
-  </section>
+    <div class="flip glass h-24">
+      <div class="flip-inner">
+        <div class="face front">🍰 Авторский десерт от шефа</div>
+        <div class="face back">🧁 Какой был во ВкусВилле, вручит шеф Никита</div>
+      </div>
+    </div>
 
-  <!-- аудио -->
-  <audio id="fanfare" src="https://cdn.pixabay.com/download/audio/2022/02/23/audio_381c2e7d8d.mp3?filename=success-fanfare-trumpets-6185.mp3" preload="auto"></audio>
-  <audio id="bgmusic" src="https://cdn.pixabay.com/download/audio/2022/07/26/audio_00a7a0d8f3.mp3?filename=magical-chime-113985.mp3" loop preload="auto"></audio>
+    <div class="flip glass h-24">
+      <div class="flip-inner">
+        <div class="face front">💐 Букет, достойный королевского дворца</div>
+        <div class="face back">🌷 Гномы собрали эти цветы со всей планеты</div>
+      </div>
+    </div>
+  </div>
+
+  <button id="share" class="btn bg-[var(--brand)] text-white px-4 py-2 rounded-xl">Поделиться счастьем</button>
+  <p>С любовью,<br><em>Международная система радости™</em></p>
+</section>
+
+<!-- звуки -->
+<audio id="fanfare" src="https://cdn.pixabay.com/download/audio/2022/02/23/audio_381c2e7d8d.mp3?filename=success-fanfare-trumpets-6185.mp3" preload="auto"></audio>
+<audio id="bgmusic" src="https://cdn.pixabay.com/download/audio/2022/07/26/audio_00a7a0d8f3.mp3?filename=magical-chime-113985.mp3" loop preload="auto"></audio>
 
 <script>
-/* -------- короткий селектор -------- */
+/* util */
 const $ = id => document.getElementById(id);
 
-/* -------- DOM-ссылки -------- */
-const intro  = $('introAnim'),
-      main   = $('main'),
-      success= $('success'),
-      code   = $('code'),
-      enter  = $('enter'),
-      errorB = $('error'),
-      countB = $('count'),
-      fanfare= $('fanfare'),
-      bgm    = $('bgmusic');
+/* интро → main */
+setTimeout(()=>{ $('introAnim').classList.add('hidden'); $('main').classList.remove('hidden'); initParticles(); },2500);
 
-/* -------- интро исчезает через 2,5 c -------- */
-setTimeout(()=>{intro.classList.add('hidden');main.classList.remove('hidden');initParticles();},2500);
-
-/* -------- частицы -------- */
+/* частицы */
 function initParticles(){
   tsParticles.load('particles',{
     fullScreen:{enable:false},
     detectRetina:true,
-    particles:{
-      number:{value:30},
-      size:{value:{min:2,max:4}},
-      move:{enable:true,speed:0.4,parallax:{enable:true,smooth:20}},
-      opacity:{value:{min:0.3,max:0.8}},
-      color:{value:['#ff9dff','#9dfffc','#fff0c4']},
-      links:{enable:false}
-    }
+    particles:{number:{value:30},size:{value:{min:2,max:4}},move:{enable:true,speed:0.4,parallax:{enable:true,smooth:20}},opacity:{value:{min:0.3,max:0.8}},color:{value:['#ff9dff','#9dfffc','#fff0c4']},links:{enable:false}}
   });
 }
 
-/* -------- ввод кода -------- */
-let txt = "I'M A QUEEN", idx=0;
-setInterval(()=>{ if(document.activeElement!==code){ code.placeholder = txt.slice(0,idx); idx=(idx+1)% (txt.length+1);} },140);
-
-enter.onclick = check; code.onkeyup = e=>e.key==='Enter'&&check();
-
+/* ввод кода */
+const code=$('code'), enter=$('enter'), error=$('error'), count=$('count');
+let txt=\"I'M A QUEEN\", idx=0;
+setInterval(()=>{ if(document.activeElement!==code){ code.placeholder=txt.slice(0,idx); idx=(idx+1)% (txt.length+1);} },140);
+enter.onclick=check; code.onkeyup=e=>e.key==='Enter'&&check();
 function check(){
-  errorB.classList.add('hidden');
-  if(code.value.trim().toUpperCase() === txt){
-    countdown();
-  }else{
-    errorB.textContent='Код введён неверно — уходи, холоп!';
-    errorB.classList.remove('hidden');
-    code.classList.add('shake');
-    navigator.vibrate?.([200,100,200]);
-    setTimeout(()=>code.classList.remove('shake'),500);
-  }
+  error.classList.add('hidden');
+  if(code.value.trim().toUpperCase()===txt){countdown();}
+  else{error.textContent='Код введён неверно — уходи, холоп!';error.classList.remove('hidden');code.classList.add('shake');navigator.vibrate?.([200,100,200]);setTimeout(()=>code.classList.remove('shake'),500);}
 }
-
-/* -------- отсчёт 3-2-1 -------- */
 async function countdown(){
-  main.classList.add('hidden');
-  countB.classList.remove('hidden');
-  for(let n=3;n>0;n--){
-    countB.textContent=n;
-    navigator.vibrate?.(50);
-    await new Promise(r=>setTimeout(r,800));
-  }
-  showSuccess();
+  $('main').classList.add('hidden');count.classList.remove('hidden');
+  for(let n=3;n>0;n--){count.textContent=n;navigator.vibrate?.(50);await new Promise(r=>setTimeout(r,800));}
+  success();
+}
+function success(){
+  count.classList.add('hidden');$('success').classList.remove('hidden');
+  window.confetti?.({particleCount:200,spread:180,origin:{y:0.7},emojis:['💎','👑','💰']});
+  $('fanfare').play(); const bg=$('bgmusic');bg.volume=.25;bg.play();navigator.vibrate?.([120,60,120]);
 }
 
-/* -------- успех -------- */
-function showSuccess(){
-  countB.classList.add('hidden');
-  success.classList.remove('hidden');
-  if(window.confetti){
-    confetti({particleCount:200,spread:180,origin:{y:0.7},emojis:['👑','💎','💰']});
-  }
-  fanfare.play(); bgm.volume=.25; bgm.play();
-  navigator.vibrate?.([120,60,120]);
-}
+/* flip карточек */
+document.querySelectorAll('.flip').forEach(card=>{
+  card.addEventListener('click',()=>card.classList.toggle('flipped'));
+});
 
-/* -------- поделиться -------- */
-$('share').onclick = ()=>
-  navigator.share
-    ? navigator.share({title:'Queen Access',text:'Смотри, какой подарок!',url:location.href})
-    : alert('Скопируй ссылку вручную :)');
+/* share */
+$('share').onclick = () =>
+  navigator.share ? navigator.share({title:'Queen Access',text:'Смотри подарок!',url:location.href})
+                  : alert('Скопируй ссылку вручную :)');
 </script>
 </body>
 </html>
