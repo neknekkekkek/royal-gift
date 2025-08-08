@@ -88,16 +88,6 @@
   animation:vibrate 0.2s linear infinite;   /* ← заметная дрожь */
 }
 
-    /* делаем подарочные блоки круглыми и прячем углы при flip */
-.flip{
-  border-radius:0.75rem;      /* то же, что rounded-xl */
-  overflow:hidden;            /* чтобы faces не вылезали за края */
-}
-.flip-inner,
-.face{
-  border-radius:0.75rem;      /* и внутренним тоже */
-}
-
 /* отключаем дрожь, когда карточка перевернулась */
 .flip.flipped .flip-inner{
   transform:rotateY(180deg);
