@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Royal Gift – Queen Access</title>
 
+  <!-- PWA -->
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#c59fc9" />
 
@@ -12,24 +13,37 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <style>
-    :root{--brand:#c59fc9;--bg1:#ffd6e7;--bg2:#fff8f0;--text:#1e1b4b;--glass:#ffffff40;--glass-brd:#ffffff66}
-    body{margin:0;font-family:'Segoe UI',sans-serif;color:var(--text);min-height:100vh;overflow:hidden;
-         background:linear-gradient(135deg,var(--bg1),var(--bg2));background-size:400% 400%;animation:bgshift 20s ease-in-out infinite}
+    :root{
+      --brand:#c59fc9; --bg1:#ffd6e7; --bg2:#fff8f0; --text:#1e1b4b;
+      --glass:#ffffff40; --glass-brd:#ffffff66;
+    }
+    body{
+      margin:0;font-family:'Segoe UI',sans-serif;color:var(--text);
+      min-height:100vh;overflow:hidden;
+      background:linear-gradient(135deg,var(--bg1),var(--bg2));
+      background-size:400% 400%;animation:bgshift 20s ease-in-out infinite;
+    }
     @keyframes bgshift{0%{background-position:0 0}50%{background-position:100% 100%}100%{background-position:0 0}}
     .hidden{display:none}
 
-    /* стекло */
-    .glass{background:var(--glass);border:1px solid var(--glass-brd);backdrop-filter:blur(12px);
-           box-shadow:inset 0 0 18px rgba(255,255,255,.35),inset 0 0 6px rgba(255,255,255,.15)}
-
+    /* карточка-стекло */
+    .glass{
+      background:var(--glass);
+      border:1px solid var(--glass-brd);
+      backdrop-filter:blur(12px);
+      box-shadow:inset 0 0 18px rgba(255,255,255,.35),inset 0 0 6px rgba(255,255,255,.15);
+    }
     /* кнопка-блик */
     .btn-glow{position:relative;border:3px solid var(--brand);overflow:hidden;background:var(--brand);color:#fff}
-    .btn-glow::after{content:'';position:absolute;top:0;left:-120%;width:60%;height:100%;
+    .btn-glow::after{
+      content:'';position:absolute;top:0;left:-120%;width:60%;height:100%;
       background:linear-gradient(120deg,transparent 10%,rgba(255,255,255,.55) 35%,transparent 60%);
-      transform:skewX(-25deg);animation:shine 4s ease-in-out infinite}
+      transform:skewX(-25deg);animation:shine 4s ease-in-out infinite;
+    }
     @keyframes shine{0%{left:-120%}55%{left:130%}100%{left:130%}}
 
     /* shake */
@@ -37,18 +51,23 @@
       30%,50%,70%{transform:translateX(-5px);}40%,60%{transform:translateX(5px);}}
     .shake{animation:shake .48s}
 
-    /* flip-карточки + вибрация */
-    .flip{perspective:800px;cursor:pointer}
-    .flip-inner{position:relative;transition:transform .6s;transform-style:preserve-3d;height:100%;
-                animation:vibrate .8s linear infinite}
-    .flip.flipped .flip-inner{transform:rotateY(180deg);animation:none}
-    .face{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:1rem;backface-visibility:hidden}
-    .back{transform:rotateY(180deg)}
+    /* vibrate */
     @keyframes vibrate{0%{transform:translate(0)}20%{transform:translate(-6px,4px)}
       40%{transform:translate(5px,-5px)}60%{transform:translate(-5px,3px)}
       80%{transform:translate(4px,-6px)}100%{transform:translate(0)}}
 
-    /* частицы-фон */
+    /* flip-карточка */
+    .flip{perspective:800px;cursor:pointer}
+    .flip-inner{
+      position:relative;transition:transform .6s;transform-style:preserve-3d;height:100%;
+      animation:vibrate .2s linear infinite;
+    }
+    .flip.flipped .flip-inner{transform:rotateY(180deg);animation:none}
+    .face{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+          text-align:center;padding:1rem;backface-visibility:hidden}
+    .back{transform:rotateY(180deg)}
+
+    /* частицы */
     #particles{position:fixed;inset:0;z-index:-1;pointer-events:none}
 
     /* ── CAPTCHA grid ── */
@@ -57,50 +76,55 @@
     .c-tile:hover::after{content:'';position:absolute;inset:0;background:#ffffff40}
   </style>
 </head>
+<body class="selection:bg-pink-300">
 
-<body class="selection:bg-pink-300 flex items-center justify-center">
   <div id="particles"></div>
 
   <!-- интро -->
   <div id="introAnim" class="fixed inset-0 flex items-center justify-center bg-[#0008] z-50">
-    <lottie-player src="crown.json" speed="1" style="width:280px;height:280px" autoplay background="transparent"></lottie-player>
+    <lottie-player src="crown.json" background="transparent" speed="1"
+                   style="width:280px;height:280px" autoplay></lottie-player>
   </div>
 
-  <!-- 1. пароль -->
-  <section id="main" class="hidden flex flex-col items-center text-center space-y-4">
+  <!-- 1. главный экран -->
+  <section id="main" class="hidden flex flex-col items-center justify-center min-h-screen text-center p-6 space-y-4">
     <h1 class="text-3xl font-bold text-[var(--brand)]">Служба поддержки роскоши на связи!</h1>
     <p>Мы получили Ваш запрос на активацию удовольствия уровня <strong>GOLD</strong>.<br>
-       👉 Произнесите трижды «Я&nbsp;Королева»<br>👉 Введите магическое заклинание:</p>
-    <input id="code" class="input input-bordered w-64 text-center" placeholder="Введите код…">
+       👉 Произнесите трижды «Я Королева»<br>👉 Введите магическое заклинание:</p>
+    <input id="code" class="input input-bordered w-64 text-center" placeholder="Введите код…"/>
     <button id="enter" class="btn-glow px-6 py-2 rounded-xl font-semibold">Войти</button>
     <p id="error" class="text-red-600 font-semibold hidden"></p>
+    <p id="count" class="text-5xl font-extrabold mt-4 hidden"></p>
   </section>
 
-  <!-- 2. отсчёт -->
-  <p id="count" class="text-5xl font-extrabold hidden"></p>
-
-  <!-- 3. капча -->
+  <!-- 2. капча -->
   <section id="captcha" class="hidden flex flex-col items-center text-center space-y-4">
     <p><span class="font-semibold">Найди свою королеву 👑</span><br>Нажми на нужный сектор:</p>
     <div id="captchaGrid"></div>
     <p id="capErr" class="text-red-600 font-semibold hidden">Не туда, холоп! 🔄</p>
   </section>
 
-  <!-- 4. подарки -->
-  <section id="success" class="hidden flex flex-col items-center text-center space-y-6">
-    <h2 class="text-3xl font-bold text-[var(--brand)]">Доступ открыт!</h2>
-    <div class="space-y-3">
+  <!-- 3. успех -->
+  <section id="success" class="hidden flex flex-col items-center justify-center min-h-screen text-center p-6 space-y-6">
+    <svg width="120" height="120" viewBox="0 0 24 24" fill="none"
+         stroke="#c59fc9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2l3 7h7l-5 5 2 7-6-4-6 4 2-7-5-5h7z"/>
+    </svg>
+
+    <div class="grid gap-4 w-full max-w-xs">
       <div class="flip glass h-24"><div class="flip-inner">
         <div class="face front">👑 Одна настоящая купюра среди подданных</div>
         <div class="face back">💵 Настоящая купюра № 26</div></div></div>
       <div class="flip glass h-24"><div class="flip-inner">
         <div class="face front">🍰 Авторский десерт от шефа</div>
-        <div class="face back">🧁 Как во ВкусВилл, вручит шеф Никита</div></div></div>
+        <div class="face back">🧁 Какой был во ВкусВилле, вручит шеф Никита</div></div></div>
       <div class="flip glass h-24"><div class="flip-inner">
         <div class="face front">💐 Букет, достойный королевского дворца</div>
         <div class="face back">🌷 Гномы собрали эти цветы со всей планеты</div></div></div>
     </div>
+
     <button id="share" class="btn-glow px-4 py-2 rounded-xl">Поделиться счастьем</button>
+    <p>С любовью,<br><em>Международная система радости™</em></p>
   </section>
 
   <!-- звуки -->
@@ -108,18 +132,18 @@
   <audio id="bgmusic" src="https://cdn.pixabay.com/download/audio/2022/07/26/audio_00a7a0d8f3.mp3" loop preload="auto"></audio>
 
 <script>
-const $ = id=>document.getElementById(id);
+const $=id=>document.getElementById(id);
 
 /* refs */
-const intro=$('introAnim'), main=$('main'), code=$('code'), enter=$('enter'), error=$('error'),
-      count=$('count'), captcha=$('captcha'), grid=$('captchaGrid'), capErr=$('capErr'),
-      success=$('success'), fanfare=$('fanfare'), bgm=$('bgmusic');
+const intro=$('introAnim'),main=$('main'),code=$('code'),enter=$('enter'),error=$('error'),
+      count=$('count'),captcha=$('captcha'),grid=$('captchaGrid'),capErr=$('capErr'),
+      success=$('success'),fanfare=$('fanfare'),bgm=$('bgmusic');
 
-/* интро */
+/* интро → main */
 setTimeout(()=>{intro.style.display='none';main.classList.remove('hidden');},2500);
 
-/* код */
-enter.onclick=check; code.onkeyup=e=>e.key==='Enter'&&check();
+/* ввод кода */
+enter.onclick=check;code.onkeyup=e=>e.key==='Enter'&&check();
 function check(){
   error.classList.add('hidden');
   if(code.value.trim().toUpperCase()==="I'M A QUEEN"){countdown();}
@@ -152,14 +176,14 @@ function handleTile(){
        setTimeout(()=>this.classList.remove('shake'),500);}
 }
 
-/* подарки */
+/* успех */
 function openGifts(){
   captcha.classList.add('hidden');success.classList.remove('hidden');
   confetti({particleCount:200,spread:180,origin:{y:0.7}});
   fanfare.play();bgm.volume=.25;bgm.play();
 }
 
-/* flip подарков */
+/* flip */
 document.addEventListener('click',e=>{
   const card=e.target.closest('.flip');if(card)card.classList.toggle('flipped');
 });
